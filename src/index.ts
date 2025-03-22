@@ -10,6 +10,7 @@ import { Page } from './components/Page';
 import { Modal } from './components/Modal';
 import { Basket } from './components/Basket';
 import { Order } from './components/Order';
+import { Contacts } from './components/Contacts';
 
 // темплейты
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
@@ -17,6 +18,7 @@ const modalTemplate = ensureElement<HTMLTemplateElement>('#modal-container');
 const cardPreviwTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
 const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
+const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 
 
 const events = new EventEmitter();
@@ -30,6 +32,7 @@ const page = new Page(document.body, events);
 const modal = new Modal(modalTemplate, events);
 const basket = new Basket(events);
 const order = new Order(cloneTemplate(orderTemplate), events);
+const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
 
 events.onAll(({ eventName, data }) => {
     console.log(eventName, data);
@@ -115,11 +118,27 @@ events.on('order:open', () => {
 events.on('formErrors:change', (errors: Partial<OrderForm>) => {
     const { method, address, email, phone } = errors;
     order.valid = !method && !address;
-    //contacts.valid = !email && !phone;
+    contacts.valid = !email && !phone;
 })
 
 events.on(
 	/^order\..*:change/,
+	(data: { field: keyof OrderForm; value: string }) => {
+		app.setOrderField(data.field, data.value);
+	}
+);
+
+events.on('order:submit', () => {
+    modal.render({ content: contacts.render({
+        email: '',
+        phone: '',
+        valid: false,
+        errors: [],
+    })})
+});
+
+events.on(
+	/^contacts\..*:change/,
 	(data: { field: keyof OrderForm; value: string }) => {
 		app.setOrderField(data.field, data.value);
 	}
