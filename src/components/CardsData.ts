@@ -1,4 +1,4 @@
-import { ICard } from "../types";
+import { ICard, ICardAction } from "../types";
 import { ensureElement } from "../utils/utils";
 import { Component } from "./base/Component";
 
@@ -18,15 +18,23 @@ export class CardData extends Component<ICard> {
 		['хард-скил', '_hard'],
 	]);
 
-    constructor(container: HTMLElement) {
+    constructor(container: HTMLElement, actions?: ICardAction) {
         super(container);
 
         this._title = ensureElement<HTMLElement>('.card__title', container);
-        this._image = ensureElement<HTMLImageElement>('.card__image', container);
 
+        this._image = container.querySelector('.card__image');
         this._category = container.querySelector('.card__category');
         this._price = container.querySelector('.card__price');
         this._button = container.querySelector('.card__button');
+
+        if (actions?.onClick) {
+            if (this._button) {
+                this._button.addEventListener('click', actions.onClick);
+            } else {
+                container.addEventListener('click', actions.onClick);
+            }
+        }
     }
 
     // сеттеры данных карточки
@@ -34,20 +42,38 @@ export class CardData extends Component<ICard> {
         this.container.dataset.id = value;
     }
 
+    get id():string {
+        return this.container.dataset.id;
+    }
+
     set title(value:string) {
-        this._title.textContent = value;
+        this.setText(this._title, value);
     }
 
     set image(value:string) {
-        this._image.src = value;
+        this.setImage(this._image, value, this.title);
     }
 
     set category(value:string) {
-        this._category.textContent = value;
-        this._category.classList.add(`card__category${this._categoryColor.get(value)}`);
+        this.setText(this._category, value);
+        this._category?.classList.add(`card__category${this._categoryColor.get(value)}`);
+    }
+
+    get price() {
+        return this._price.textContent;
     }
 
     set price(value: string) {
-        this._price.textContent = value ? this._price.textContent = `${value} синапсов` : this._price.textContent = `Бесценно`;
+        if (value) {
+			this.setText(this._price, `${value} синапсов`);
+		} else {
+			this.setText(this._price, 'Бесценно');
+		}
+
+        if (this._button) this._button.disabled = !value;
+    }
+
+    set button(value: string) {
+        this.setText(this._button, value);
     }
 }

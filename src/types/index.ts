@@ -8,18 +8,29 @@ export interface ICard {
     price: number | null;
 }
 
-export interface ApiResponse {
-    items: IProduct[];
-}
-
-export interface IProduct {
-    id: string;
-    title: string;
-}
+export type PaymentMethod = 'cash' | 'card';
 
 export interface IOrderForm {
-    method: string;
+    method: PaymentMethod;
     address: string;
     email: string;
     phone: string;
+}
+
+export interface IPage {
+    basketCounter: number;
+    catalog: HTMLElement[];
+}
+
+export interface IModalData {
+    content: HTMLElement;
+}
+
+export interface ICardAction {
+    onClick: (event: MouseEvent) => void;
+}
+
+export interface IBasket {
+    items: string[];
+    price: number;
 }

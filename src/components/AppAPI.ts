@@ -6,14 +6,18 @@ export interface IAppAPI {
 }
 
 export class AppAPI extends Api implements IAppAPI {
-    constructor(baseUrl: string, options?: RequestInit) {
+    readonly cdn: string;
+
+    constructor(baseUrl: string, cdn: string, options?: RequestInit) {
         super(baseUrl, options);
+        this.cdn = cdn;
     }
 
     getCardList(): Promise<ICard[]> {
         return this.get('/product').then((data: ApiListResponse<ICard>) => 
             data.items.map((item) => ({
-                ...item
+                ...item,
+			    image: this.cdn + item.image,
             }))
         )
     }
