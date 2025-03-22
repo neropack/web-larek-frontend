@@ -11,6 +11,7 @@ import { Modal } from './components/Modal';
 import { Basket } from './components/Basket';
 import { Order } from './components/Order';
 import { Contacts } from './components/Contacts';
+import { Success } from './components/Success';
 
 // темплейты
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
@@ -19,6 +20,7 @@ const cardPreviwTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
 const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
+const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
 
 const events = new EventEmitter();
@@ -107,7 +109,7 @@ events.on('basket:change', () => {
 
 events.on('order:open', () => {
     modal.render({ content: order.render({
-        method: 'card',
+        payment: 'card',
         address: '',
         valid: false,
         errors: [],
@@ -116,8 +118,8 @@ events.on('order:open', () => {
 })
 
 events.on('formErrors:change', (errors: Partial<OrderForm>) => {
-    const { method, address, email, phone } = errors;
-    order.valid = !method && !address;
+    const { payment, address, email, phone } = errors;
+    order.valid = !payment && !address;
     contacts.valid = !email && !phone;
 })
 
@@ -143,3 +145,24 @@ events.on(
 		app.setOrderField(data.field, data.value);
 	}
 );
+
+events.on('contacts:submit', () => {
+    console.log(app.order);
+    api.orderCards(app.order)
+        .then(() => {
+            const success = new Success(cloneTemplate(successTemplate), {
+                onClick: () => {
+                    modal.close();
+                }
+            })
+            app.clearBusket();
+            events.emit('basket:change');
+            modal.render({
+                content: success.render({ total: app.order.total })
+            })
+            modal.open();
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+})

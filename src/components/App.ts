@@ -12,7 +12,7 @@ export class App {
         email: '',
         phone: '',
         address: '',
-        method: 'card',
+        payment: 'card',
         total: 0,
         items: [],
     }
@@ -48,11 +48,11 @@ export class App {
     }
 
     setPaymentMethod(method: PaymentMethod) {
-        this.order.method = method;
+        this.order.payment = method;
     }
 
     setOrderField(field: keyof OrderForm, value: string) {
-        if (field === 'method') {
+        if (field === 'payment') {
             this.setPaymentMethod(value as PaymentMethod);
         } else {
             this.order[field] = value;
@@ -60,7 +60,7 @@ export class App {
 
         console.log('hey')
 
-        if (this.order.method && this.validateOrder()) {
+        if (this.order.payment && this.validateOrder()) {
             this.order.total = this.basket.price;
             this.order.items = this.basket.items;
         }
@@ -91,5 +91,12 @@ export class App {
         console.log(this.formErrors);
         this.events.emit('formErrors:change', this.formErrors);
         return Object.keys(errors).length === 0;
+    }
+
+    clearBusket() {
+        this.items = [];
+        this.basket.items = [];
+        this.basket.price = 0;
+        this.events.emit('basket:change');
     }
 }

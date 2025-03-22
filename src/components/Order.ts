@@ -16,12 +16,12 @@ export class Order extends Form<OrderForm> {
 
         this._paymentCard.addEventListener('click', () => {
             this.payment = 'card';
-            this.onInputChange('method', 'card');
+            this.onInputChange('payment', 'card');
         })
 
         this._paymentCash.addEventListener('click', () => {
             this.payment = 'cash';
-            this.onInputChange('method', 'cash');
+            this.onInputChange('payment', 'cash');
         })
     }
 

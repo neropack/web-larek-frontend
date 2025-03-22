@@ -8,6 +8,11 @@ export interface ICard {
     price: number | null;
 }
 
+export interface IAppAPI {
+    getCardList: () => Promise<void | ICard[]>;
+    orderCards: (order: IOrder) => Promise<IOrderResult>;
+}
+
 export interface IForm {
     valid: boolean;
     errors: string[];
@@ -16,7 +21,7 @@ export interface IForm {
 export type PaymentMethod = 'cash' | 'card';
 
 export interface IOrder {
-    method: PaymentMethod;
+    payment: PaymentMethod;
     address: string;
     email: string;
     phone: string;
@@ -42,4 +47,13 @@ export interface ICardAction {
 export interface IBasket {
     items: string[];
     price: number;
+}
+
+export interface IOrderResult {
+    id: string;
+    total: number;
+}
+
+export interface ISuccessAction {
+    onClick: (event: MouseEvent) => void;
 }
