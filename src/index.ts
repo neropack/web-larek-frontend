@@ -1,7 +1,7 @@
 import './scss/styles.scss';
 import { EventEmitter } from './components/base/events';
 import { API_URL, CDN_URL } from './utils/constants';
-import { ICard } from './types';
+import { ICard, OrderForm } from './types';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { CardData } from './components/CardsData';
 import { App } from './components/App';
@@ -9,12 +9,14 @@ import { AppAPI } from './components/AppAPI';
 import { Page } from './components/Page';
 import { Modal } from './components/Modal';
 import { Basket } from './components/Basket';
+import { Order } from './components/Order';
 
 // темплейты
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const modalTemplate = ensureElement<HTMLTemplateElement>('#modal-container');
 const cardPreviwTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
 const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
+const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 
 
 const events = new EventEmitter();
@@ -27,6 +29,7 @@ const app = new App(events);
 const page = new Page(document.body, events);
 const modal = new Modal(modalTemplate, events);
 const basket = new Basket(events);
+const order = new Order(cloneTemplate(orderTemplate), events);
 
 events.onAll(({ eventName, data }) => {
     console.log(eventName, data);
@@ -98,3 +101,26 @@ events.on('basket:change', () => {
 
     basket.price = app.basket.price;
 })
+
+events.on('order:open', () => {
+    modal.render({ content: order.render({
+        method: 'card',
+        address: '',
+        valid: false,
+        errors: [],
+    }) });
+    modal.open();
+})
+
+events.on('formErrors:change', (errors: Partial<OrderForm>) => {
+    const { method, address, email, phone } = errors;
+    order.valid = !method && !address;
+    //contacts.valid = !email && !phone;
+})
+
+events.on(
+	/^order\..*:change/,
+	(data: { field: keyof OrderForm; value: string }) => {
+		app.setOrderField(data.field, data.value);
+	}
+);

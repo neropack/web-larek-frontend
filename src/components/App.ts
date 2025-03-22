@@ -1,4 +1,4 @@
-import { IBasket, ICard } from "../types";
+import { IBasket, ICard, IOrder, OrderForm, PaymentMethod } from "../types";
 import { IEvents } from "./base/events";
 
 export class App {
@@ -8,6 +8,16 @@ export class App {
         items: [],
         price: 0,
     }
+    order: IOrder = {
+        email: '',
+        phone: '',
+        address: '',
+        method: 'card',
+        total: 0,
+        items: [],
+    }
+
+    formErrors: Partial<Record<keyof OrderForm, string>> = {};
 
     constructor(protected events: IEvents) {};
 
@@ -35,5 +45,51 @@ export class App {
         this.basket.items = this.basket.items.filter((id) => id != item.id);
         this.basket.price -= item.price;
         this.events.emit('basket:change', this.basket);
+    }
+
+    setPaymentMethod(method: PaymentMethod) {
+        this.order.method = method;
+    }
+
+    setOrderField(field: keyof OrderForm, value: string) {
+        if (field === 'method') {
+            this.setPaymentMethod(value as PaymentMethod);
+        } else {
+            this.order[field] = value;
+        }
+
+        console.log('hey')
+
+        if (this.order.method && this.validateOrder()) {
+            this.order.total = this.basket.price;
+            this.order.items = this.basket.items;
+        }
+    }
+
+    validateOrder() {
+        const errors: typeof this.formErrors = {};
+
+        const email_regex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+.[a-zA-Z0-9_-]+)/;
+
+        if (!this.order.address) {
+            errors.address = 'Необходимо указать адрес';
+        }
+
+        if (!this.order.email) {
+            errors.email = 'Необходимо указать email';
+        }
+
+        if (!email_regex.test(this.order.email)) {
+            errors.email = 'Необходимо указать корректный email';
+        }
+
+        if (!this.order.phone) {
+            errors.phone = 'Необходимо указать телефон';
+        }
+
+        this.formErrors = errors;
+        console.log(this.formErrors);
+        this.events.emit('formErrors:change', this.formErrors);
+        return Object.keys(errors).length === 0;
     }
 }

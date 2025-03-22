@@ -16,7 +16,11 @@ export class Basket extends View<IBasket> {
         this._price = this.container.querySelector('.basket__price');
         this._button = this.container.querySelector('.button');
 
-        // сделать слушатель оформления заказа order:open
+        if (this._button) {
+            this._button.addEventListener('click', () => {
+                events.emit('order:open');
+            })
+        }
 
         this.items = [];
     }
@@ -36,4 +40,4 @@ export class Basket extends View<IBasket> {
     }
 }
 
-// сделать индексы для товаров
+// TODO: сделать индексы для товаров

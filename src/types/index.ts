@@ -8,14 +8,23 @@ export interface ICard {
     price: number | null;
 }
 
+export interface IForm {
+    valid: boolean;
+    errors: string[];
+}
+
 export type PaymentMethod = 'cash' | 'card';
 
-export interface IOrderForm {
+export interface IOrder {
     method: PaymentMethod;
     address: string;
     email: string;
     phone: string;
+    items: string[];
+    total: number;
 }
+
+export type OrderForm = Omit<IOrder, 'total' | 'items'>;
 
 export interface IPage {
     basketCounter: number;
