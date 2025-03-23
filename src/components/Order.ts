@@ -12,7 +12,6 @@ export class Order extends Form<OrderForm> {
 
         this._paymentCard = ensureElement<HTMLButtonElement>('.button_alt[name=card]', this.container);
         this._paymentCash = ensureElement<HTMLButtonElement>('.button_alt[name=cash]', this.container);
-        console.log(this._paymentCash)
 
         this._paymentCard.addEventListener('click', () => {
             this.payment = 'card';

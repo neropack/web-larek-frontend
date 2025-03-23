@@ -14,11 +14,17 @@ export class Modal extends View<IModalData> {
         this._content = ensureElement<HTMLElement>('.modal__content', container);
 
         this._closeButton.addEventListener('click', this.close.bind(this));
-        // this.container.addEventListener('mousedown', this.close.bind(this));
+        this.container.addEventListener('mouseup', this.handleMouseUp.bind(this));
     }
 
     set content(value: HTMLElement) {
         this._content.replaceChildren(value);
+    }
+
+    handleMouseUp(event: MouseEvent) {
+        if (event.target === this.container) {
+            this.close();
+        }
     }
 
     open() {

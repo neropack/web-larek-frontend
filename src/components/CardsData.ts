@@ -22,7 +22,7 @@ export class CardData extends Component<ICard> {
         super(container);
 
         this._title = ensureElement<HTMLElement>('.card__title', container);
-
+        
         this._image = container.querySelector('.card__image');
         this._category = container.querySelector('.card__category');
         this._price = container.querySelector('.card__price');

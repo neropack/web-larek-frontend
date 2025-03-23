@@ -89,6 +89,7 @@ events.on('modal:close', () => {
 
 events.on('basket:open', () => {
     modal.render({ content: basket.render() });
+    basket.refreshIndex();
     modal.open();
 })
 
@@ -100,10 +101,9 @@ events.on('basket:change', () => {
         const card = new CardData(cloneTemplate(cardBasketTemplate), {
             onClick: () => app.removeFromBasket(item),
         });
-        console.log(item);
         return card.render(item);
     })
-
+    basket.refreshIndex();
     basket.price = app.basket.price;
 })
 
@@ -120,7 +120,9 @@ events.on('order:open', () => {
 events.on('formErrors:change', (errors: Partial<OrderForm>) => {
     const { payment, address, email, phone } = errors;
     order.valid = !payment && !address;
+    order.errors = Object.values({payment, address}).filter(i => !!i).join('; ');
     contacts.valid = !email && !phone;
+    contacts.errors = Object.values({email, phone}).filter(i => !!i).join('; ');
 })
 
 events.on(
@@ -147,7 +149,6 @@ events.on(
 );
 
 events.on('contacts:submit', () => {
-    console.log(app.order);
     api.orderCards(app.order)
         .then(() => {
             const success = new Success(cloneTemplate(successTemplate), {

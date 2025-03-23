@@ -7,7 +7,7 @@ export class Basket extends View<IBasket> {
     static template = ensureElement<HTMLTemplateElement>('#basket');
     protected _list: HTMLElement;
     protected _price: HTMLElement;
-    protected _button: HTMLElement;
+    protected _button: HTMLButtonElement;
 
     constructor(protected events: EventEmitter) {
         super(cloneTemplate(Basket.template), events);
@@ -28,16 +28,25 @@ export class Basket extends View<IBasket> {
     set items(items: HTMLElement[]) {
         if (items.length) {
             this._list.replaceChildren(...items);
+            this._button.disabled = false;
         } else {
             this._list.replaceChildren(createElement<HTMLParagraphElement>('p', {
                 textContent: 'Корзина пуста',
             }))
+            this._button.disabled = true;
         }
     }
 
     set price(price: number) {
         this.setText(this._price, `${price} синапсов`);
     }
-}
 
-// TODO: сделать индексы для товаров
+    refreshIndex() {
+        Array.from(this._list.children).forEach((item, index) => {
+            const indexElement = item.querySelector('.basket__item-index');
+            if (indexElement) {
+                    indexElement.textContent = (index + 1).toString();
+                }
+            })
+    }
+}
