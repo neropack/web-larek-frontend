@@ -8,6 +8,11 @@ export interface ICard {
     price: number | null;
 }
 
+export interface IBasket {
+    items: string[];
+    price: number;
+}
+
 export interface IAppAPI {
     getCardList: () => Promise<void | ICard[]>;
     orderCards: (order: IOrder) => Promise<IOrderResult>;
@@ -44,10 +49,6 @@ export interface ICardAction {
     onClick: (event: MouseEvent) => void;
 }
 
-export interface IBasket {
-    items: string[];
-    price: number;
-}
 
 export interface IOrderResult {
     id: string;
