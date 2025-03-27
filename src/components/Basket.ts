@@ -1,16 +1,15 @@
 import { IBasket } from "../types";
-import { cloneTemplate, createElement, ensureElement } from "../utils/utils";
+import { createElement, ensureElement } from "../utils/utils";
 import { View } from "./base/Component";
 import { EventEmitter } from "./base/events";
 
 export class Basket extends View<IBasket> {
-    static template = ensureElement<HTMLTemplateElement>('#basket');
     protected _list: HTMLElement;
     protected _price: HTMLElement;
     protected _button: HTMLButtonElement;
 
-    constructor(protected events: EventEmitter) {
-        super(cloneTemplate(Basket.template), events);
+    constructor(protected container: HTMLElement, protected events: EventEmitter) {
+        super(container, events);
 
         this._list = ensureElement<HTMLElement>('.basket__list', this.container);
         this._price = this.container.querySelector('.basket__price');

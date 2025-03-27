@@ -17,7 +17,6 @@ export class Page extends View<IPage> {
         this._basket = ensureElement<HTMLElement>('.header__basket');
         this._wrapper = ensureElement<HTMLElement>('.page__wrapper');
 
-        // сделать слушатель на открытие корзины basket:open
         this._basket.addEventListener('click', () => {
             this.events.emit('basket:open');
         })

@@ -1,13 +1,9 @@
 import { IBasket, ICard, IOrder, OrderForm, PaymentMethod } from "../types";
 import { IEvents } from "./base/events";
 
-export class App {
-    items: ICard[] = [];
+export class AppData {
     preview: ICard = null;
-    basket: IBasket = {
-        items: [],
-        price: 0,
-    }
+    catalog: ICard[];
     order: IOrder = {
         email: '',
         phone: '',
@@ -22,8 +18,8 @@ export class App {
     constructor(protected events: IEvents) {};
 
     setItems(items: ICard[]) {
-        this.items = items;
-        this.events.emit('items:change', this.items);
+        this.catalog = items;
+        this.events.emit('items:change', this.catalog);
     }
 
     setModal(item: ICard) {
@@ -32,19 +28,20 @@ export class App {
     }
 
     inBasket(item: ICard) {
-        return this.basket.items.includes(item.id);
+        return this.order.items.includes(item.id);
     }
 
     addToBasket(item: ICard) {
-        this.basket.items.push(item.id);
-        this.basket.price += item.price;
-        this.events.emit('basket:change', this.basket);
+        console.log(item);
+        this.order.items.push(item.id);
+        this.order.total = this.getTotalPrice()
+        this.events.emit('basket:change', this.order.items);
     }
 
     removeFromBasket(item:ICard) {
-        this.basket.items = this.basket.items.filter((id) => id != item.id);
-        this.basket.price -= item.price;
-        this.events.emit('basket:change', this.basket);
+        this.order.items = this.order.items.filter((id) => id != item.id);
+        this.order.total = this.getTotalPrice()
+        this.events.emit('basket:change', this.order.items);
     }
 
     setPaymentMethod(method: PaymentMethod) {
@@ -58,18 +55,13 @@ export class App {
             this.order[field] = value;
         }
 
-        console.log('hey')
-
         if (this.order.payment && this.validateOrder()) {
-            this.order.total = this.basket.price;
-            this.order.items = this.basket.items;
+            this.order.total = this.getTotalPrice();
         }
     }
 
     validateOrder() {
         const errors: typeof this.formErrors = {};
-
-        const email_regex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+.[a-zA-Z0-9_-]+)/;
 
         if (!this.order.address) {
             errors.address = 'Необходимо указать адрес';
@@ -79,8 +71,8 @@ export class App {
             errors.email = 'Необходимо указать email';
         }
 
-        if (!email_regex.test(this.order.email)) {
-            errors.email = 'Необходимо указать корректный email';
+        if (!this.order.email) {
+            errors.email = 'Необходимо указать email';
         }
 
         if (!this.order.phone) {
@@ -93,10 +85,20 @@ export class App {
         return Object.keys(errors).length === 0;
     }
 
-    clearBusket() {
-        this.items = [];
-        this.basket.items = [];
-        this.basket.price = 0;
+    clearOrder() {
+        this.order = {
+            email: '',
+            phone: '',
+            address: '',
+            payment: 'card',
+            total: 0,
+            items: [],
+        }
+        this.formErrors = {};
         this.events.emit('basket:change');
+    }
+
+    getTotalPrice() {
+        return this.catalog.filter(card => this.order.items.includes(card.id)).reduce((sum, card) => sum + card.price, 0);
     }
 }

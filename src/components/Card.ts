@@ -2,7 +2,7 @@ import { ICard, ICardAction } from "../types";
 import { ensureElement } from "../utils/utils";
 import { Component } from "./base/Component";
 
-export class CardData extends Component<ICard> {
+export class Card extends Component<ICard> {
     protected _title: HTMLElement;
     protected _image: HTMLImageElement;
     protected _category: HTMLElement;
@@ -42,10 +42,6 @@ export class CardData extends Component<ICard> {
         this.container.dataset.id = value;
     }
 
-    get id():string {
-        return this.container.dataset.id;
-    }
-
     set title(value:string) {
         this.setText(this._title, value);
     }
@@ -57,10 +53,6 @@ export class CardData extends Component<ICard> {
     set category(value:string) {
         this.setText(this._category, value);
         this._category?.classList.add(`card__category${this._categoryColor.get(value)}`);
-    }
-
-    get price() {
-        return this._price.textContent;
     }
 
     set price(value: string) {

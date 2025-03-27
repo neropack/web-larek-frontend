@@ -30,7 +30,7 @@ export interface IOrder {
     address: string;
     email: string;
     phone: string;
-    items: string[];
+    items: string[]; //раньше было string[]
     total: number;
 }
 

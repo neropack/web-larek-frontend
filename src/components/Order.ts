@@ -14,12 +14,10 @@ export class Order extends Form<OrderForm> {
         this._paymentCash = ensureElement<HTMLButtonElement>('.button_alt[name=cash]', this.container);
 
         this._paymentCard.addEventListener('click', () => {
-            this.payment = 'card';
             this.onInputChange('payment', 'card');
         })
 
         this._paymentCash.addEventListener('click', () => {
-            this.payment = 'cash';
             this.onInputChange('payment', 'cash');
         })
     }
