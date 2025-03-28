@@ -91,20 +91,19 @@ events.on('modal:open', () => {
 
 events.on('modal:close', () => {
     page.locked = false;
+    // варворское решение; можно сделать проверку сравенения isModalType какое модальное окно было закрыто order | contacts,  но пока поварёшка уже не варит
+    app.clearValidation();
 })
 
 events.on('basket:open', () => {
-    console.log(app.order.items);
     modal.render({ content: basket.render() });
     basket.refreshIndex();
     modal.open();
 })
 
 events.on('basket:change', () => {
-    //page.counter = app.basket.items.length;
     page.counter = app.order.items.length;
 
-    // раньше было app.basket.items.map((id) => ... const item = app.items.find((item) => item.id === id.id))
     basket.items = app.order.items.map((id) => {
         const item = app.catalog.find((item) => item.id === id);
         const card = new Card(cloneTemplate(cardBasketTemplate), {
@@ -113,7 +112,6 @@ events.on('basket:change', () => {
         return card.render(item);
     })
     basket.refreshIndex();
-    // basket.price = app.basket.price;
     basket.price = app.getTotalPrice();
 })
 
@@ -139,11 +137,13 @@ events.on(
 	/^order\..*:change/,
 	(data: { field: keyof OrderForm; value: string }) => {
 		app.setOrderField(data.field, data.value);
-        if (data.field === 'payment') {
-            order.payment = data.value as PaymentMethod;
-        }
 	}
 );
+
+// событие возникающее в app.setOrderField(data.field, data.value) после присваивания значений для полей заказа
+events.on('orderpayment:change', (data: { field: keyof OrderForm; value: string }) => {
+    order.payment = data.value as PaymentMethod;
+});
 
 events.on('order:submit', () => {
     modal.render({ content: contacts.render({
@@ -162,8 +162,11 @@ events.on(
 );
 
 events.on('contacts:submit', () => {
-    console.log(app.order);
-    api.orderCards(app.order)
+    const order = {
+        ...app.order,
+        total: app.getTotalPrice(),
+    };
+    api.orderCards(order)
         .then((res) => {
             app.clearOrder();
             modal.render({

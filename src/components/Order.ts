@@ -30,5 +30,4 @@ export class Order extends Form<OrderForm> {
     set address(value: string) {
         (this.container.elements.namedItem('address') as HTMLInputElement).value = value;
     }
-
 }

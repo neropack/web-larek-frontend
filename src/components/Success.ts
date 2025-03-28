@@ -11,7 +11,6 @@ export class Success extends Component<IOrderResult> {
 
         this._total = ensureElement<HTMLElement>('.order-success__description', this.container);
         this._close = ensureElement<HTMLButtonElement>('.order-success__close', this.container);
-        console.log(this._close)
 
         if(actions.onClick) {
             if (this._close) {
