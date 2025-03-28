@@ -31,7 +31,6 @@ export class AppData {
     }
 
     addToBasket(item: ICard) {
-        console.log(item);
         this.order.items.push(item.id);
         this.events.emit('basket:change', this.order.items);
     }
@@ -72,7 +71,6 @@ export class AppData {
         }
 
         this.formErrors = errors;
-        console.log(this.formErrors);
         this.events.emit('formErrors:change', this.formErrors);
         return Object.keys(errors).length === 0;
     }
