@@ -90,13 +90,4 @@ export class AppData {
     getTotalPrice() {
         return this.catalog.filter(card => this.order.items.includes(card.id)).reduce((sum, card) => sum + card.price, 0);
     }
-
-    clearValidation() {
-        // не чистим поле items, а то потеряем добавленные товары
-        this.formErrors = {};
-        this.order.email = '';
-        this.order.phone = '';
-        this.order.address = '';
-        this.order.payment = 'card';
-    }
 }

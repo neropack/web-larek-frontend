@@ -91,8 +91,6 @@ events.on('modal:open', () => {
 
 events.on('modal:close', () => {
     page.locked = false;
-    // варворское решение; можно сделать проверку сравенения isModalType какое модальное окно было закрыто order | contacts,  но пока поварёшка уже не варит
-    app.clearValidation();
 })
 
 events.on('basket:open', () => {
@@ -117,12 +115,13 @@ events.on('basket:change', () => {
 
 events.on('order:open', () => {
     modal.render({ content: order.render({
-        payment: 'card',
-        address: '',
+        payment: app.order.payment,
+        address: app.order.address,
         valid: false,
         errors: [],
     }) });
     modal.open();
+    app.validateOrder();
 })
 
 events.on('formErrors:change', (errors: Partial<OrderForm>) => {
@@ -147,11 +146,12 @@ events.on('orderpayment:change', (data: { field: keyof OrderForm; value: string 
 
 events.on('order:submit', () => {
     modal.render({ content: contacts.render({
-        email: '',
-        phone: '',
+        email: app.order.email,
+        phone: app.order.phone,
         valid: false,
         errors: [],
     })})
+    app.validateOrder();
 });
 
 events.on(
